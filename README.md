@@ -46,5 +46,26 @@ A continuación se detallan los pasos para ejecutar el programa, desde la instal
 ## Versiones
 
 A continuación se detallan las versiones de las herramientas utilizadas en cada solución.
-
-
+- General
+    - Python: 3.12.0
+    - Pip: 24.0
+Package         Version       Need to install (Not for default)
+--------------- -----------  ------------------------------
+blinker         1.7.0        No
+click           8.1.7        No
+colorama        0.4.6        No
+et-xmlfile      1.1.0        No
+Flask           3.0.3        Yes
+itsdangerous    2.2.0        No
+Jinja2          3.1.3        No
+MarkupSafe      2.1.5        No
+mpi4py          3.1.6        Yes
+numpy           1.26.4       Yes      
+pandas          2.2.2        Yes
+pip             24.0.0       No
+psycopg2-binary 2.9.9        Yes
+python-dateutil 2.9.0.post0  No
+pytz            2024.1       No
+six             1.16.0       No
+tzdata          2024.1       No
+Werkzeug        3.0.2        No
