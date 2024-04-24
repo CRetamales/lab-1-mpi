@@ -1,0 +1,111 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: rgb(241 245 249);
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+    padding: 0;
+}
+
+button {
+    margin-top: 10px;
+    padding: 10px 20px;
+    background-color: #007BFF;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+#results {
+    width: 38rem;
+    height: 35rem;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    margin-top: 20px;
+    padding: 20px;
+    background-color: white;
+    border: 1px solid #ddd;
+    @media (max-width: 700px) {
+        width: 14rem;
+        height: 15rem;
+    }
+}
+
+.container-header {
+    display: flex;
+    width: 100vw;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.container-body{
+    display: flex;
+    flex-direction: column;
+    width: 100vw;
+    justify-content: center;
+    align-items: center;
+}
+
+.content-header {
+    display: flex;
+    flex-direction: row;
+    background-color: #ffffff;
+    border: 1px solid #ddd;
+    border-radius: 15px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    width: 40rem;
+    justify-content: center;
+    align-items: center;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+
+    .logo {
+        img {
+            width: 5rem;
+            height: 5rem;
+        }
+    }
+
+    @media (max-width: 700px) {
+        flex-direction: column;
+        width: 17rem;
+
+        h1 {
+            font-size: 1rem;
+        }
+
+        .logo {
+            margin-top: 1rem;
+            img {
+                width: 3rem;
+                height: 3rem;
+            }
+        }
+    }
+}
+
+.content-body{
+    display: flex;
+    flex-direction: row;
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+    gap: 1rem;
+    background-color: #ffffff;
+    border: 1px solid #ddd;
+    border-radius: 15px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    width: 40rem;
+    justify-content: center;
+    align-items: center;
+
+
+    @media (max-width: 700px) {
+        width: 17rem;
+        flex-direction: column;
+    }
+}

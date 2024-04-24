@@ -1,1 +1,1 @@
-"# Soluci¢n Monol°tica" 
+# Soluci√≥n Monol√≠tica 
