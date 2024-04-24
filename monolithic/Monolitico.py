@@ -11,12 +11,13 @@ from flask import Flask, request, jsonify, render_template
 from concurrent.futures import ThreadPoolExecutor
 #import os
 from pathlib import Path
+from database import Database
 
 #------------------------- Const
 filename = "data.csv"
 output = "output.csv"
-global_results = None
 app = Flask(__name__)
+db = Database(dbname='dis1', user='postgres', password='postgres', host='localhost', port='5432')
 
 #------------------------- Functions
 
@@ -45,13 +46,14 @@ Output: Nothing
 """
 @app.route('/upload', methods=['POST'])
 def upload_data():
-    global global_results
     file = request.files['file']
     if not file:
         return "Archivo no encontrado", 400
     try:
         data = pd.read_csv(file, names=["station", "temperature"], sep=';')
-        global_results = process_data_with_thread(data)
+        results = process_data_with_thread(data)
+        for _, row in results.iterrows():
+            db.insert_data(row['station'], row['min'], row['max'], row['mean'])
         return "Datos procesados exitosamente", 200
     except Exception as e:
         return str(e), 500
@@ -96,10 +98,11 @@ def save(data,output_filepath):
 """
 @app.route('/results', methods=['GET'])
 def get_results():
-    global global_results
-    if global_results is None:
-        return "No hay resultados disponibles", 404
-    return global_results.to_json(orient='records')
+    try:
+        data = db.fetch_data()
+        return jsonify(data)
+    except Exception as e:
+        return str(e), 500
 
 #------------------------- Main
 def main():
