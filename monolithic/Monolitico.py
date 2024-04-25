@@ -7,15 +7,13 @@ Nombres: Carlos Retamales (19.839.974-4); David Valero (20.636.919-1)
 '''
 #------------------------- Import
 import pandas as pd
-from flask import Flask, request, jsonify, render_template
+from flask import Flask, request, jsonify, render_template, Response
 from concurrent.futures import ThreadPoolExecutor
 #import os
-from pathlib import Path
+#from pathlib import Path
 from database import Database
 
 #------------------------- Const
-filename = "data.csv"
-output = "output.csv"
 app = Flask(__name__)
 db = Database(dbname='dis1', user='postgres', password='postgres', host='localhost', port='5432')
 
@@ -30,6 +28,13 @@ Output: Nothing
 def index():
     try: 
         return render_template('index.html')
+    except:
+        return "Error al cargar la pagina"
+    
+@app.route('/info', methods=['GET'])
+def info():
+    try:
+        return render_template('info.html')
     except:
         return "Error al cargar la pagina"
 """
@@ -71,7 +76,7 @@ def process_data_with_thread(data):
     with ThreadPoolExecutor(max_workers=num_hilos) as executor:
         results = list(executor.map(calculate_statistics, chunks))
     final_result = pd.concat(results)
-    return final_result.groupby('station').agg({'min': 'min', 'max': 'max', 'mean': 'mean'}).reset_index()
+    return final_result.groupby('station').agg({'min': 'min', 'max': 'max', 'mean': 'mean'}).round(1).reset_index()
 
 """
 This function is the one that will be executed when the user wants to see the results of the data processing, without using threads.
@@ -83,18 +88,28 @@ def process_data(data):
 
 
 """
-This function to save the result in a file with .csv extension.
-Input: <class 'pandas.core.frame.DataFrame'> with the data, output file path as String.
-Output: write in output.csv of the results, that being "station, min temp, max temp, mean temp".
-"""
-def save(data,output_filepath):
-    data.to_csv(output_filepath, index=False)
-    print(f"Resultados guardados en {output_filepath}")
-
-
+This function gives the user the option to save the results of the data processing in a file.
 """
 
+@app.route('/save', methods=['GET'])
+def save_data():
+    try:
+        data = db.fetch_data() 
+        df = pd.DataFrame(data)
+        csv = df.to_csv(index=False)
+        return Response(
+            csv,
+            mimetype="text/csv",
+            headers={"Content-disposition": "attachment; filename=temperature_data" + str(pd.Timestamp.now()) + ".csv"}
+        )
+    except Exception as e:
+        return str(e), 500
 
+
+"""
+This function is the one that will be executed when the user wants to see the results of the data processing.
+Input: Nothing
+Output: jsonify(data) as <class 'dict'> with the results of the data processing.
 """
 @app.route('/results', methods=['GET'])
 def get_results():

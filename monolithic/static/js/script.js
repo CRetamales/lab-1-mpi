@@ -22,3 +22,19 @@ function fetchResults() {
     })
     .catch(error => alert('Error al obtener resultados: ' + error));
 }
+
+/*
+Function to download the results in csv format
+*/
+function downloadResults() {
+    fetch('/save')
+    .then(response => response.blob())
+    .then(blob => {
+        const url = window.URL.createObjectURL(new Blob([blob]));
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = response.headers.get('content-disposition').split('filename=')[1];
+        a.click();
+    })
+    .catch(error => alert('Error al descargar resultados: ' + error));
+}
