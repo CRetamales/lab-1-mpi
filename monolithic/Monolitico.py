@@ -4,6 +4,7 @@ Sistemas Distribuidos
 Profesor: Manuel Ignacio Manríquez
 Ayudante: Ariel Madariaga
 Nombres: Carlos Retamales (19.839.974-4); David Valero (20.636.919-1)
+Solution: Monolithic
 '''
 #------------------------- Import
 import pandas as pd
@@ -31,14 +32,22 @@ def index():
     except:
         return "Error al cargar la pagina"
     
+"""
+This function is the one that will be executed when the user wants to see the information of the program.
+Input: Nothing
+Output: Nothing
+""" 
 @app.route('/info', methods=['GET'])
 def info():
     try:
         return render_template('info.html')
     except:
         return "Error al cargar la pagina"
+    
 """
-
+Function to calculate the statistics of the data.
+Input: data as <class 'pandas.core.frame.DataFrame'> with the data.
+Output: <class 'pandas.core.frame.DataFrame'> with the results of the data processing.
 """
 def calculate_statistics(data):
     return data.groupby('station')['temperature'].agg(['min', 'max', 'mean']).reset_index()
@@ -89,8 +98,9 @@ def process_data(data):
 
 """
 This function gives the user the option to save the results of the data processing in a file.
+Input: Nothing
+Output: Response(csv, mimetype="text/csv", headers={"Content-disposition": "attachment; filename=temperature_data" + str(pd.Timestamp.now()) + ".csv"})
 """
-
 @app.route('/save', methods=['GET'])
 def save_data():
     try:

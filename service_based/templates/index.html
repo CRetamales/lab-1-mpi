@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lab 1 - Monolitico</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="icon" href="{{ url_for('static', filename='icons/favicon.ico') }}">
+</head>
+
+<body>
+    <div class="container-header">
+        
+        <div class="content-header">
+            <div class="info">
+                <a href="/info">
+                    <svg width="1rem" height="1rem" viewBox="0 0 256 256">
+                        <path fill="currentColor"
+                            d="M128 0C57.31 0 0 57.31 0 128s57.31 128 128 128s128-57.31 128-128S198.69 0 128 0zm0 240c-60.63 0-112-49.37-112-112S67.37 16 128 16s112 49.37 112 112s-49.37 112-112 112zm-8-64h16v-16h-16v16zm0-32h16v-64h-16v64z" />
+                    </svg>
+                </a>
+            </div>
+            <div class="logo">
+                <img src="{{ url_for('static', filename='icons/logo.png') }}" alt="logo">
+            </div>
+            <h1>Estadísticas de Estaciones</h1>
+        </div>
+    </div>
+    <div class="container-body">
+        <div class="content-body">
+            <form id="uploadForm" class="upload-form">
+                <input type="file" id="fileInput" accept=".csv">
+                <button type="submit" class="upload-button">Subir
+                    <svg width="1rem" height="1rem" viewBox="0 0 256 256">
+                        <path fill="currentColor"
+                            d="M48 180c0 8.67 5.49 16 12 16a10.27 10.27 0 0 0 7.33-3.43a12 12 0 1 1 17.34 16.6A34 34 0 0 1 60 220c-19.85 0-36-18-36-40s16.15-40 36-40a34 34 0 0 1 24.67 10.83a12 12 0 1 1-17.34 16.6A10.27 10.27 0 0 0 60 164c-6.51 0-12 7.31-12 16m97.51-5.71c-5.13-3.45-11.33-5.24-16.8-6.82a79.5 79.5 0 0 1-7.91-2.59c2.45-1.18 9.71-1.3 16.07.33A12 12 0 0 0 143 142a69.24 69.24 0 0 0-12-1.86c-9.93-.66-18 1.08-24.1 5.17a24.45 24.45 0 0 0-10.69 17.76c-1.1 8.74 2.48 16.27 10.11 21.19c4.78 3.09 10.36 4.7 15.75 6.26c3 .89 7.94 2.3 9.88 3.53a2 2 0 0 1-.22.71c-1.36 1.55-9.57 1.79-16.39-.06a12 12 0 0 0-6.45 23.11a63.73 63.73 0 0 0 16.2 2.19c6.47 0 13.74-1.17 19.74-5.15a24.73 24.73 0 0 0 10.95-18c1.22-9.32-2.46-17.32-10.27-22.58ZM216 140.68a12 12 0 0 0-15.3 7.32l-8.7 24.3l-8.7-24.3a12 12 0 1 0-22.6 8l20 56a12 12 0 0 0 22.6 0l20-56a12 12 0 0 0-7.3-15.32M36 108V40a20 20 0 0 1 20-20h96a12 12 0 0 1 8.49 3.51l56 56A12 12 0 0 1 220 88v20a12 12 0 1 1-24 0v-4h-48a12 12 0 0 1-12-12V44H60v64a12 12 0 1 1-24 0m124-28h23l-23-23Z" />
+                    </svg>
+                </button>
+            </form>
+            
+        </div>
+        <div class="container-body">
+            <div class="content-body">
+            <div class="buttons">
+                <button onclick="fetchResults()">
+                    Ver Resultados
+                </button>
+                <button >
+                    <a href="/save">Descargar</a>
+                </button>
+            </div>
+        </div>
+        </div>
+        <div id="results"></div>
+    </div>
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+
+</html>
