@@ -11,6 +11,8 @@ from flask import Flask, request, jsonify, render_template, Response, redirect, 
 import subprocess
 from database import Database
 import pandas as pd
+import time
+import os
 
 #------------------------- Const
 app = Flask(__name__)
@@ -36,10 +38,14 @@ Output: Nothing
 def upload():
     file = request.files['file']
     if file:
-        file_path = 'temp_data.csv'
+        timestamp = time.strftime("%Y%m%d-%H%M%S")
+        file_path = f"temp_data_{timestamp}.csv"
         file.save(file_path)
         # Inicia el script MPI usando subprocess para manejar el procesamiento de datos
-        subprocess.Popen(['mpiexec', '-n', '4', 'python', 'mpi_process.py', file_path])
+        process = subprocess.Popen(['mpiexec', '-n', '4', 'python', 'mpi_event_handler.py', file_path])
+        process.wait()
+        os.remove(file_path)
+        
         return "Archivo cargado exitosamente, los resultados estarán disponibles en unos minutos."
     return "No se pudo cargar el archivo", 400
 
@@ -72,7 +78,7 @@ def download():
         return Response(
             csv,
             mimetype="text/csv",
-            headers={"Content-disposition": "attachment; filename=results.csv"}
+            headers={"Content-disposition": "attachment; filename=temperature_data" + str(pd.Timestamp.now()) + ".csv"}
         )
     except Exception as e:
         return str(e), 500
