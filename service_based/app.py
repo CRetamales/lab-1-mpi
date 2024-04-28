@@ -35,24 +35,32 @@ Input: data (DataFrame)
 Output: DataFrame with the statistics of the data
 """
 def distribute_data(data):
-    try:
-        if rank == 0:
-            chunks = numpy.array_split(data, size)
-            for i in range(1, size):
-                comm.send(chunks[i].to_dict('records'), dest=i, tag=11)
-            master_results = calculate_statistics(chunks[0])
-            results = [master_results]
-            for i in range(1, size):
-                result = comm.recv(source=i, tag=12)
-                results.append(pd.DataFrame(result))
-            final_result = pd.concat(results)
-            return final_result
-        else:
-            data_chunk = comm.recv(source=0, tag=11)
-            processed_data = calculate_statistics(pd.DataFrame(data_chunk))
-            comm.send(processed_data.to_dict('records'), dest=0, tag=12)
-    except Exception as e:
-        print(f"Error en el proceso {rank}: {str(e)}")
+    chunks = numpy.array_split(data, size)
+    for i in range(1, size):
+        comm.send(chunks[i].to_dict('records'), dest=i, tag=11)
+    return chunks[0]
+
+"""
+Function to collect the data from the different processes
+Input: master_results (DataFrame)
+Output: DataFrame with the statistics of the data
+"""
+def collect_data(master_results):
+    results = [master_results]
+    for i in range(1, size):
+        result = comm.recv(source=i, tag=12)
+        results.append(pd.DataFrame(result))
+    return pd.concat(results)
+
+"""
+Function to process the data
+Input: data (DataFrame)
+Output: DataFrame with the statistics of the data
+"""
+def process_data_chunk():
+    data_chunk = comm.recv(source=0, tag=11)
+    processed_data = calculate_statistics(pd.DataFrame(data_chunk))
+    comm.send(processed_data.to_dict('records'), dest=0, tag=12)
 
 """
 Function to start the Flask application
@@ -76,11 +84,14 @@ def upload_data():
     try:
         data = pd.read_csv(file, names=["station", "temperature"], sep=';')
         if rank == 0:
-            results = distribute_data(data)
-            for _, row in results.iterrows():
+            master_chunk = distribute_data(data)
+            master_results = calculate_statistics(master_chunk)
+            final_results = collect_data(master_results)
+            for _, row in final_results.iterrows():
                 db.insert_data(row['station'], row['min'], row['max'], row['mean'])
             return "Datos procesados correctamente", 200
         else:
+            process_data_chunk()
             return "Proceso no maestro, espera datos", 200
     except Exception as e:
         return str(e), 500
@@ -125,6 +136,8 @@ Output: None
 def main():
     if rank == 0:
         app.run(debug=True, port=5000)
+    else:
+        process_data_chunk()
 
 if __name__ == "__main__":
     main()
