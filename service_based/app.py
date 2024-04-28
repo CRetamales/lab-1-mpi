@@ -16,35 +16,58 @@ import numpy
 
 #------------------------- Const
 app = Flask(__name__)
-db = Database(dbname='dis5', user='postgres', password='postgres', host='localhost', port='5432')
+db = Database(dbname='dis2', user='postgres', password='postgres', host='localhost', port='5432')
 comm = MPI.COMM_WORLD
 rank = comm.Get_rank()
 size = comm.Get_size()
 
+"""
+Function to calculate the statistics of the data
+Input: data (DataFrame)
+Output: DataFrame with the statistics of the data
+"""
 def calculate_statistics(data):
     return data.groupby('station')['temperature'].agg(['min', 'max', 'mean']).reset_index()
 
+"""
+Function to distribute the data to the different processes
+Input: data (DataFrame)
+Output: DataFrame with the statistics of the data
+"""
 def distribute_data(data):
-    if rank == 0:
-        chunks = numpy.array_split(data, size)
-        for i in range(1, size):
-            comm.send(chunks[i].to_dict('records'), dest=i, tag=11)
-        master_results = calculate_statistics(chunks[0])
-        results = [master_results]
-        for i in range(1, size):
-            result = comm.recv(source=i, tag=12)
-            results.append(pd.DataFrame(result))
-        final_result = pd.concat(results)
-        return final_result
-    else:
-        data_chunk = comm.recv(source=0, tag=11)
-        processed_data = calculate_statistics(pd.DataFrame(data_chunk))
-        comm.send(processed_data.to_dict('records'), dest=0, tag=12)
+    try:
+        if rank == 0:
+            chunks = numpy.array_split(data, size)
+            for i in range(1, size):
+                comm.send(chunks[i].to_dict('records'), dest=i, tag=11)
+            master_results = calculate_statistics(chunks[0])
+            results = [master_results]
+            for i in range(1, size):
+                result = comm.recv(source=i, tag=12)
+                results.append(pd.DataFrame(result))
+            final_result = pd.concat(results)
+            return final_result
+        else:
+            data_chunk = comm.recv(source=0, tag=11)
+            processed_data = calculate_statistics(pd.DataFrame(data_chunk))
+            comm.send(processed_data.to_dict('records'), dest=0, tag=12)
+    except Exception as e:
+        print(f"Error en el proceso {rank}: {str(e)}")
 
+"""
+Function to start the Flask application
+Input: None
+Output: None
+"""
 @app.route('/')
 def index():
     return render_template('index.html')
 
+"""
+Function to upload the data to the application
+Input: None
+Output: None
+"""
 @app.route('/upload', methods=['POST'])
 def upload_data():
     file = request.files['file']
@@ -62,14 +85,24 @@ def upload_data():
     except Exception as e:
         return str(e), 500
 
+"""
+Function to get the results of the data
+Input: None
+Output: JSON with the results of the data
+"""
 @app.route('/results', methods=['GET'])
 def get_results():
     try:
-        data = db.fetch_data()
+        data = db.fetch_data() 
         return jsonify(data)
     except Exception as e:
         return str(e), 500
 
+"""
+Function to save the data to a CSV file
+Input: None
+Output: CSV file with the data
+"""
 @app.route('/save', methods=['GET'])
 def save_data():
     try:
@@ -84,6 +117,11 @@ def save_data():
     except Exception as e:
         return str(e), 500
 
+"""
+Function to start the application
+Input: None
+Output: None
+"""
 def main():
     if rank == 0:
         app.run(debug=True, port=5000)

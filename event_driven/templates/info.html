@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lab 1 - Monolitico</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="icon" href="{{ url_for('static', filename='icons/favicon.ico') }}">
+</head>
+
+<body>
+    <div class="container-info">
+        <div class="info">
+            <a href="/">
+                <svg  viewBox="0 0 24 24">
+                    <path fill="white"
+                        d="M4 21V9l8-6l8 6v12h-6v-7h-4v7z">
+                </svg>
+            </a>
+        </div>
+        <div class="content-info">
+            <h1>Información</h1>
+            <p>A continuación se muestra cómo utilizar la API de estadísticas de estaciones:</p>
+            <ul>
+                <li>Subir un archivo CSV con los datos de las estaciones.</li>
+                <li>Ver los resultados de las estadísticas.</li>
+                <li>Descargar los resultados en formato CSV.</li>
+            </ul>
+            <p>El archivo CSV debe tener la siguiente estructura:</p>
+            <ul>
+                <li>Las columnas deben ser: 'station', 'temperature'.</li>
+                <li>La columna 'station' debe contener el nombre de la estación.</li>
+                <li>La columna 'temperature' debe contener la temperatura en grados Celsius.</li>
+            </ul>
+            <p>Para subir un archivo CSV, haga clic en el botón 'Subir' y seleccione el archivo en su computadora.</p>
+            <p>Para ver los resultados de las estadísticas, haga clic en el botón 'Ver Resultados'.</p>
+            <p>Para descargar los resultados en formato CSV, haga clic en el botón 'Descargar'.</p>
+            <p>Usando hoopscotch/postman para probar la API:</p>
+            <ul>
+                <li>URL: http://localhost:5000/upload (POST) con el archivo CSV en el cuerpo de la solicitud.</li>
+                <li>URL: http://localhost:5000/results (GET) para ver los resultados de las estadísticas.</li>
+                <li>URL: http://localhost:5000/save (GET) para descargar los resultados en formato CSV.</li>
+            </ul>
+    </div>
+</body>
+
+</html>
