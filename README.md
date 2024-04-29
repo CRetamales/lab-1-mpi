@@ -55,7 +55,17 @@ o instalar las dependencias de forma manual abriendo el archivo `requirements.tx
 pip install <package>
 ```
 
-2. Ejecutar el programa:
+2. Editar las variables de entorno en el archivo `.env` con los valores correspondientes (se debe acceder a la carpeta `monolithic`, `service_based` o `event_driven` para editar el archivo `.env`), en base a las credenciales para conectarse a la base de datos.
+Siendo:
+```env
+DB_USER=<user>
+DB_PASSWORD=<password>
+DB_HOST=<host>
+DB_PORT=<port>
+DB_NAME=<database>
+```
+
+3. Ejecutar el programa:
 ```bash
 python <folder_solution>/app.py
 ```
@@ -121,7 +131,7 @@ A continuación se detallan las versiones de las herramientas utilizadas en cada
 | tzdata          | 2024.1        | No                                         |
 | Werkzeug        | 3.0.2         | No                                         |
 | psutil          | 5.9.8         | Yes                                        |
-
+| python-dotenv   | 0.19.1        | Yes                                        |
 
 - Servicios y Eventos:
 
