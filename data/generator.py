@@ -19,7 +19,7 @@ def save_in_chunks(data_frame, file_path, chunk_size=500):
             else:
                 data_frame.iloc[i:i+chunk_size].to_csv(f, index=False, sep=';', header=False, mode='a')
 
-sizes = [10000, 100000, 1000000]
+sizes = [500,5000,50000,500000,5000000,50000000]
 
 for size in sizes:
     data = generate_station_data(size)
