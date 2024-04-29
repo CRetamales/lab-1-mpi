@@ -13,10 +13,19 @@ from concurrent.futures import ThreadPoolExecutor
 from database import Database
 from mpi4py import MPI
 import numpy
+import time 
+import os
+from dotenv import load_dotenv
 
 #------------------------- Const
+load_dotenv()
+db_name = os.getenv('DB_NAME', 'distributed_systems')
+user = os.getenv('DB_USER', 'postgres')
+password = os.getenv('DB_PASSWORD', 'postgres')
+host = os.getenv('DB_HOST', 'localhost')
+port = os.getenv('DB_PORT', '5432')
 app = Flask(__name__)
-db = Database(dbname='dis2', user='postgres', password='postgres', host='localhost', port='5432')
+db = Database(dbname=db_name, user=user, password=password, host=host, port=port)
 comm = MPI.COMM_WORLD
 rank = comm.Get_rank()
 size = comm.Get_size()
@@ -71,6 +80,19 @@ Output: None
 def index():
     return render_template('index.html')
 
+
+"""
+This function is the one that will be executed when the user wants to see the information of the program.
+Input: Nothing
+Output: Nothing
+""" 
+@app.route('/info', methods=['GET'])
+def info():
+    try:
+        return render_template('info.html')
+    except:
+        return "Error al cargar la pagina"
+    
 """
 Function to upload the data to the application
 Input: None
@@ -84,9 +106,13 @@ def upload_data():
     try:
         data = pd.read_csv(file, names=["station", "temperature"], sep=';')
         if rank == 0:
+            start = time.time()
             master_chunk = distribute_data(data)
             master_results = calculate_statistics(master_chunk)
             final_results = collect_data(master_results)
+            end = time.time()
+            elapsed_time = end - start
+            print(f"Elapsed time: {elapsed_time}")
             for _, row in final_results.iterrows():
                 db.insert_data(row['station'], row['min'], row['max'], row['mean'])
             return "Datos procesados correctamente", 200

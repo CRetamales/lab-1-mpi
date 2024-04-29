@@ -13,10 +13,17 @@ from database import Database
 import pandas as pd
 import time
 import os
+from dotenv import load_dotenv
 
 #------------------------- Const
+load_dotenv()
+db_name = os.getenv('DB_NAME', 'distributed_systems')
+user = os.getenv('DB_USER', 'postgres')
+password = os.getenv('DB_PASSWORD', 'postgres')
+host = os.getenv('DB_HOST', 'localhost')
+port = os.getenv('DB_PORT', '5432')
 app = Flask(__name__)
-db = Database(dbname='dis3', user='postgres', password='postgres', host='localhost', port='5432')
+db = Database(dbname=db_name, user=user, password=password, host=host, port=port)
 
 #------------------------- Functions
 
@@ -33,6 +40,18 @@ def index():
 This function is the one that will be executed when the user wants to see the information of the program.
 Input: Nothing
 Output: Nothing
+""" 
+@app.route('/info', methods=['GET'])
+def info():
+    try:
+        return render_template('info.html')
+    except:
+        return "Error al cargar la pagina"
+
+"""
+This function is the one that will be executed when the user wants to see the information of the program.
+Input: Nothing
+Output: Nothing
 """
 @app.route('/upload', methods=['POST'])
 def upload():
@@ -41,11 +60,11 @@ def upload():
         timestamp = time.strftime("%Y%m%d-%H%M%S")
         file_path = f"temp_data_{timestamp}.csv"
         file.save(file_path)
-        # Inicia el script MPI usando subprocess para manejar el procesamiento de datos
+        # Start the MPI process
         process = subprocess.Popen(['mpiexec', '-n', '4', 'python', 'mpi_event_handler.py', file_path])
-        process.wait()
-        os.remove(file_path)
-        
+        # Remove the files after processing
+        #process.wait()
+        #os.remove(file_path)
         return "Archivo cargado exitosamente, los resultados estarán disponibles en unos minutos."
     return "No se pudo cargar el archivo", 400
 
@@ -57,7 +76,6 @@ Output: Nothing
 @app.route('/results', methods=['GET'])
 def results():
     try:
-        # Obtiene los datos de la base de datos
         data = db.fetch_data()
         return jsonify(data)
     except Exception as e:
@@ -71,7 +89,6 @@ Output: Nothing
 @app.route('/save', methods=['GET'])
 def download():
     try:
-        # Descarga los resultados como CSV desde la base de datos
         data = db.fetch_data()
         df = pd.DataFrame(data)
         csv = df.to_csv(index=False)

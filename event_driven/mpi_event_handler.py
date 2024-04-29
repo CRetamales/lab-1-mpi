@@ -12,12 +12,22 @@ import pandas as pd
 import sys
 from database import Database
 import numpy
+import time
+import os
+from dotenv import load_dotenv
 
 #------------------------- Const
+load_dotenv()
+db_name = os.getenv('DB_NAME', 'distributed_systems')
+user = os.getenv('DB_USER', 'postgres')
+password = os.getenv('DB_PASSWORD', 'postgres')
+host = os.getenv('DB_HOST', 'localhost')
+port = os.getenv('DB_PORT', '5432')
+
 comm = MPI.COMM_WORLD
 rank = comm.Get_rank()
 size = comm.Get_size()
-db = Database(dbname='dis3', user='postgres', password='postgres', host='localhost', port='5432')
+db = Database(dbname=db_name, user=user, password=password, host=host, port=port)
 
 #------------------------- Functions
 
@@ -39,6 +49,7 @@ def handle_event(event_type, data=None):
         if rank == 0:
             filepath = data
             full_data = pd.read_csv(filepath, names=["station", "temperature"], sep=';')
+            start_time = time.time()
             chunks = numpy.array_split(full_data, size)
             # Send data chunks to workers
             for i in range(1, size):
@@ -51,9 +62,11 @@ def handle_event(event_type, data=None):
                 event = comm.recv(source=i, tag=12)
                 results.append(pd.DataFrame(event['data']))
             final_result = pd.concat(results)
+            end_time = time.time()
+            print(f"Time elapsed: {end_time - start_time}")
             # Insert into database
-            for _, row in final_result.iterrows():
-                db.insert_data(row['station'], row['min'], row['max'], row['mean'])
+            #for _, row in final_result.iterrows():
+            #    db.insert_data(row['station'], row['min'], row['max'], row['mean'])
         else:
             event = comm.recv(source=0, tag=11)
             if event['type'] == 'ProcessData':

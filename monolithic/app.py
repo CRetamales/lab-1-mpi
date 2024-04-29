@@ -10,13 +10,22 @@ Solution: Monolithic
 import pandas as pd
 from flask import Flask, request, jsonify, render_template, Response
 from concurrent.futures import ThreadPoolExecutor
-#import os
+import os
 #from pathlib import Path
 from database import Database
+import time # For testing purposes
+
+from dotenv import load_dotenv
 
 #------------------------- Const
+load_dotenv()
+db_name = os.getenv('DB_NAME', 'distributed_systems')
+user = os.getenv('DB_USER', 'postgres')
+password = os.getenv('DB_PASSWORD', 'postgres')
+host = os.getenv('DB_HOST', 'localhost')
+port = os.getenv('DB_PORT', '5432')
 app = Flask(__name__)
-db = Database(dbname='dis1', user='postgres', password='postgres', host='localhost', port='5432')
+db = Database(dbname=db_name, user=user, password=password, host=host, port=port)
 
 #------------------------- Functions
 
@@ -74,18 +83,38 @@ def upload_data():
 
 
 """
+Function to save the time of the test
+Input: time as <class 'float'> with the time of the test.
+Output: Nothing
+"""
+def save_test(time):
+    #Save the time in a file 'time.csv'
+    with open('time.csv', 'a') as f:
+        f.write(str(time) + '\n')
+    
+
+
+"""
 This function is the one that will be executed when the user wants to see the results of the data processing, using threads.
 Input: data as <class 'pandas.core.frame.DataFrame'> with the data.
 Output: <class 'pandas.core.frame.DataFrame'> with the results of the data processing.
 """
 def process_data_with_thread(data):
+    #Time initialization
+    start_time = time.time()
     num_hilos = 4
     chunk_size = len(data) // num_hilos + 1
     chunks = [data.iloc[i:i + chunk_size] for i in range(0, len(data), chunk_size)]
     with ThreadPoolExecutor(max_workers=num_hilos) as executor:
         results = list(executor.map(calculate_statistics, chunks))
     final_result = pd.concat(results)
-    return final_result.groupby('station').agg({'min': 'min', 'max': 'max', 'mean': 'mean'}).round(1).reset_index()
+    final_result = final_result.groupby('station').agg({'min': 'min', 'max': 'max', 'mean': 'mean'}).round(1).reset_index()
+    #Time finalization
+    elapsed_time = time.time() - start_time
+    print("Elapsed time: ", elapsed_time)
+    #save_test(elapsed_time)
+    return final_result
+
 
 """
 This function is the one that will be executed when the user wants to see the results of the data processing, without using threads.

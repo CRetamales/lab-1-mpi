@@ -1,0 +1,7 @@
+flask
+numpy
+pandas
+psycopg2
+psutil
+mpi4py
+python-dotenv
