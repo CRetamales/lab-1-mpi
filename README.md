@@ -39,9 +39,55 @@ A continuación se detallan los aspectos generales del laboratorio.
 
 ## Instrucciones
 
-A continuación se detallan los pasos para ejecutar el programa, desde la instalación de las dependencias hasta la ejecución del programa de cada solución.
+A continuación se detallan los pasos para ejecutar el programa, desde la instalación de las dependencias hasta la ejecución del programa de cada solución, para los requerimientos de cada solución esta la sección de [Versiones](#versiones).
 
-### Requisitos
+### General
+Las soluciones se encuentran en las carpetas `monolithic`, `service_based` y `event_driven`, cada una con su propio archivo `README.md` con las instrucciones para ejecutar el programa.
+
+Para ejecutar la solución <folder_solution>(monolithic, service_based, event_driven) se deben seguir los siguientes pasos:
+
+1. Instalar las dependencias necesarias:
+```bash
+pip install -r <folder_solution>/requirements.txt
+```
+o instalar las dependencias de forma manual abriendo el archivo `requirements.txt` y ejecutando el siguiente comando:
+```bash
+pip install <package>
+```
+
+2. Ejecutar el programa:
+```bash
+python <folder_solution>/app.py
+```
+o
+```bash
+python3 <folder_solution>/app.py
+```
+o
+```bash
+py <folder_solution>/app.py
+```
+o para la solución basada en eventos:
+```bash
+mpiexec -n <number_of_processes> python <folder_solution>/app.py
+```
+
+3. Seguir las instrucciones del programa.
+
+### General
+Después de ejecutar el programa, se mostrará en terminal que se ha iniciado el servidor en el puerto 5000, para acceder a la interfaz gráfica se debe abrir un navegador y acceder a la dirección `http://localhost:5000/`.
+
+En la interfaz se dispondra de tres botones, uno para cargar el archivo, otro para procesar el archivo y otro para descargar el archivo procesado. Los archivos se deben cargar en formato `.csv` y el archivo procesado se descargará en formato `.csv`. 
+En caso de que se presione el botón 'Ver resultados' se mostrará en pantalla los resultados del procesamiento del archivo en forma json.
+Tambien se dispone de un botón info que muestra información sobre el programa.
+
+Otra forma de interactuar con el programa es mediante postman/hoppscotch, para ello se debe realizar un post a la dirección `http://localhost:5000/<request>` con un body de tipo form-data y una key llamada `file` con el archivo a procesar.
+El flujo en postman/hoppscotch sería el siguiente:
+1. Realizar un post a la dirección `http://localhost:5000/upload` con un body de tipo form-data y una key llamada `file` con el archivo a procesar.
+2. Realizar un get a la dirección `http://localhost:5000/results` para ver los resultados del procesamiento del archivo.
+3. Realizar un get a la dirección `http://localhost:5000/save` para descargar el archivo procesado.
+
+
 
 ## Versiones
 
@@ -49,23 +95,36 @@ A continuación se detallan las versiones de las herramientas utilizadas en cada
 - General
     - Python: 3.12.0
     - Pip: 24.0
-Package         Version       Need to install (Not for default)
---------------- -----------  ------------------------------
-blinker         1.7.0        No
-click           8.1.7        No
-colorama        0.4.6        No
-et-xmlfile      1.1.0        No
-Flask           3.0.3        Yes
-itsdangerous    2.2.0        No
-Jinja2          3.1.3        No
-MarkupSafe      2.1.5        No
-mpi4py          3.1.6        Yes
-numpy           1.26.4       Yes      
-pandas          2.2.2        Yes
-pip             24.0.0       No
-psycopg2-binary 2.9.9        Yes
-python-dateutil 2.9.0.post0  No
-pytz            2024.1       No
-six             1.16.0       No
-tzdata          2024.1       No
-Werkzeug        3.0.2        No
+    - PostgreSQL: 14.2+
+    - HTML: 5
+    - CSS: 3
+    - JavaScript: 6
+
+| Package         | Version       | Necesitas Instalarlo (No viene por defecto) |
+|-----------------|---------------|--------------------------------------------|
+| blinker         | 1.7.0         | No                                         |
+| click           | 8.1.7         | No                                         |
+| colorama        | 0.4.6         | No                                         |
+| et-xmlfile      | 1.1.0         | No                                         |
+| Flask           | 3.0.3         | Yes                                        |
+| itsdangerous    | 2.2.0         | No                                         |
+| Jinja2          | 3.1.3         | No                                         |
+| MarkupSafe      | 2.1.5         | No                                         |
+| mpi4py          | 3.1.6         | Yes                                        |
+| numpy           | 1.26.4        | Yes                                        |
+| pandas          | 2.2.2         | Yes                                        |
+| pip             | 24.0.0        | No                                         |
+| psycopg2-binary | 2.9.9         | Yes                                        |
+| python-dateutil | 2.9.0.post0   | No                                         |
+| pytz            | 2024.1        | No                                         |
+| six             | 1.16.0        | No                                         |
+| tzdata          | 2024.1        | No                                         |
+| Werkzeug        | 3.0.2         | No                                         |
+| psutil          | 5.9.8         | Yes                                        |
+
+
+- Servicios y Eventos:
+
+Se necesita de instalar mpi en el sistema operativo, para ello se puede seguir el siguiente tutorial: [Instalación de MPI](https://learn.microsoft.com/en-us/message-passing-interface/microsoft-mpi), en otros sistemas operativos se puede seguir el siguiente tutorial: [Instalación de MPI en Linux](https://www.open-mpi.org/faq/?category=building#easy-build)
+
+- Para el caso de la base de datos se necesita instalar PostgreSQL, para ello se puede seguir el siguiente tutorial: [Instalación de PostgreSQL](https://www.postgresql.org/download/), o tambien se puede instalar mediante docker, para ello se puede seguir el siguiente tutorial: [Instalación de PostgreSQL con Docker](https://hub.docker.com/_/postgres)
